@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b2a52">
+<title>投递记录 · Yac</title>
+<style>
+:root{
+  --bg:#f4f6fa;
+  --card:#ffffff;
+  --ink:#16202c;
+  --muted:#6b7a8d;
+  --line:#e4e9f0;
+  --accent:#0b5fd6;
+  --accent-soft:#e8f0fe;
+  --danger:#b91c1c;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,32,52,.04),0 4px 14px rgba(16,32,52,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  line-height:1.6;-webkit-text-size-adjust:100%;
+}
+button,input,select,textarea{font-family:inherit;font-size:15px;color:inherit}
+button{cursor:pointer}
+
+/* ---------- header ---------- */
+.site-header{background:linear-gradient(135deg,#0b2a52,#0b5fd6);color:#fff;padding:20px 0 18px}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+.head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand h1{margin:0;font-size:20px;letter-spacing:.5px;font-weight:650}
+.brand .sub{font-size:12.5px;opacity:.75;font-weight:400}
+.dot{width:9px;height:9px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 4px rgba(94,234,212,.18);flex:none}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ghost-btn{
+  background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);
+  padding:7px 13px;border-radius:9px;font-size:13.5px;transition:.15s;
+}
+.ghost-btn:hover{background:rgba(255,255,255,.22)}
+.mobile-add{display:none}
+.summary{font-size:12.5px;opacity:.82;margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
+.summary b{font-weight:650}
+
+/* ---------- toolbar ---------- */
+.toolbar{max-width:960px;margin:16px auto 0;padding:0 16px}
+.toolbar-inner{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search-box{position:relative;flex:1 1 220px;min-width:180px}
+.search-box input{
+  width:100%;padding:9px 12px 9px 34px;border:1px solid var(--line);border-radius:9px;
+  background:#fbfcfe;outline:none;transition:.15s;
+}
+.search-box input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(11,95,214,.12)}
+.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted)}
+select.ctl,input.ctl{
+  padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#fbfcfe;outline:none;
+}
+select.ctl:focus,input.ctl:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,95,214,.12)}
+.primary-btn{
+  background:var(--accent);color:#fff;border:1px solid var(--accent);padding:9px 16px;
+  border-radius:9px;font-weight:600;font-size:14.5px;transition:.15s;margin-left:auto;
+}
+.primary-btn:hover{background:#0a54bd}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  border:1px solid var(--line);background:#fbfcfe;color:var(--muted);
+  padding:5px 12px;border-radius:999px;font-size:13px;transition:.15s;
+}
+.chip:hover{border-color:#c8d3e2;color:var(--ink)}
+.chip.on{background:var(--accent-soft);border-color:#bcd3f7;color:var(--accent);font-weight:600}
+.chip .n{opacity:.6;font-size:12px;margin-left:2px}
+
+/* ---------- list ---------- */
+.list{max-width:960px;margin:14px auto 60px;padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.job-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:13px 15px;transition:.15s;
+}
+.job-card:hover{border-color:#d5dfec}
+.card-head{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.card-title{min-width:0;flex:1}
+.company{font-weight:650;font-size:16px;line-height:1.35;word-break:break-word}
+.position{color:#374556;font-size:14px;margin-top:1px;word-break:break-word}
+.pill{
+  display:inline-block;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600;
+  white-space:nowrap;flex:none;
+}
+.meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:8px}
+.meta span{display:inline-flex;align-items:center;gap:4px}
+.note-line{
+  margin-top:8px;font-size:13.5px;color:#3b4a5c;background:#f8fafd;border-left:3px solid #dbe4f0;
+  padding:6px 10px;border-radius:0 8px 8px 0;white-space:pre-wrap;word-break:break-word;
+}
+.card-foot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.status-select{
+  padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe;font-size:13px;
+}
+.status-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,95,214,.12)}
+.mini-btn{
+  background:#fbfcfe;border:1px solid var(--line);color:#43536b;padding:5px 11px;border-radius:8px;font-size:13px;
+  transition:.15s;
+}
+.mini-btn:hover{background:#f1f5fb;border-color:#cfdae8}
+.mini-btn.danger:hover{background:#fdeaea;border-color:#f3c6c6;color:var(--danger)}
+.spacer{flex:1}
+.timeline{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:none}
+.timeline.open{display:block}
+.tl-item{display:flex;gap:10px;font-size:13px;padding:4px 0}
+.tl-date{color:var(--muted);font-variant-numeric:tabular-nums;flex:none;width:82px}
+.tl-body{flex:1;min-width:0}
+.tl-tag{font-weight:600}
+.tl-note{color:var(--muted);font-size:12.5px}
+
+/* ---------- empty ---------- */
+.empty{
+  text-align:center;padding:48px 20px;color:var(--muted);
+  background:var(--card);border:1px dashed #d9e2ee;border-radius:var(--radius);
+}
+.empty h3{margin:0 0 6px;color:var(--ink);font-size:16px}
+.empty p{margin:0 0 16px;font-size:13.5px}
+
+/* ---------- dialog ---------- */
+dialog{
+  border:none;border-radius:16px;padding:0;width:min(520px,calc(100vw - 24px));
+  box-shadow:0 20px 60px rgba(12,28,48,.28);background:var(--card);color:var(--ink);
+}
+dialog::backdrop{background:rgba(15,28,45,.45);backdrop-filter:blur(2px)}
+.dlg-head{padding:16px 18px 0;display:flex;justify-content:space-between;align-items:center}
+.dlg-head h2{margin:0;font-size:17px}
+.dlg-body{padding:14px 18px 4px;max-height:min(66vh,560px);overflow:auto}
+.dlg-foot{padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;color:#46586e;margin-bottom:5px;font-weight:600}
+.field label .req{color:var(--danger)}
+.field input,.field select,.field textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fbfcfe;outline:none;transition:.15s;
+}
+.field textarea{resize:vertical;min-height:68px;line-height:1.55}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(11,95,214,.12);
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:12px;color:var(--muted);margin-top:5px}
+.err{color:var(--danger);font-size:12.5px;margin-top:6px;display:none}
+.err.show{display:block}
+.sec-title{
+  font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  margin:2px 0 8px;font-weight:700;
+}
+.btn{
+  padding:9px 16px;border-radius:9px;border:1px solid var(--line);background:#fbfcfe;font-size:14px;font-weight:600;
+}
+.btn:hover{background:#f1f5fb}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#0a54bd}
+.btn.danger{background:#fff;border-color:#f0c9c9;color:var(--danger)}
+.btn.danger:hover{background:#fdeaea}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);
+  background:#17202c;color:#fff;padding:9px 16px;border-radius:10px;font-size:13.5px;
+  opacity:0;pointer-events:none;transition:.22s;z-index:99;max-width:calc(100vw - 32px);
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+.tip{max-width:960px;margin:0 auto 32px;padding:0 16px;font-size:12.5px;color:var(--muted);line-height:1.7}
+@media (max-width:560px){
+  .brand h1{font-size:18px}
+  .grid2{grid-template-columns:1fr}
+  .tl-date{width:70px}
+  .meta{gap:10px}
+  /* 手机上压扁工具栏：搜索+排序同一行，筛选按钮独占一行 */
+  .site-header{padding:12px 0 10px}
+  .summary{gap:10px;font-size:12px;margin-top:7px}
+  .toolbar{margin-top:10px}
+  .toolbar-inner{padding:8px;gap:7px}
+  .row{gap:6px}
+  .search-box{flex:1 1 140px;min-width:0}
+  .search-box input{padding:8px 10px 8px 32px;font-size:14px}
+  .row select.ctl{flex:1 1 0;min-width:0;font-size:13px;padding:7px 6px}
+  /* 「记一条」在手机上收进头部，工具栏只留搜索与排序 */
+  .primary-btn{display:none}
+  .mobile-add{display:inline-flex;align-items:center;gap:5px;background:#fff;color:var(--accent);
+    border:1px solid #fff;padding:7px 14px;border-radius:9px;font-weight:700;font-size:14px}
+  .chips{gap:5px}
+  .chip{padding:4px 10px;font-size:12.5px;min-height:28px;display:inline-flex;align-items:center}
+  .job-card{padding:11px 12px;border-radius:12px}
+  .company{font-size:15.5px}
+  .status-select{font-size:12.5px;padding:4px 6px}
+  .mini-btn{padding:4px 9px;font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="head-row">
+      <div class="brand">
+        <span class="dot"></span>
+        <div>
+          <h1>投递记录</h1>
+          <div class="sub">投了哪些岗，一目了然 · 只存在本机浏览器</div>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="mobile-add" id="btnAddMobile">＋ 记一条</button>
+        <button class="ghost-btn" id="btnExport" title="把全部记录导出成一个 JSON 文件">导出备份</button>
+        <button class="ghost-btn" id="btnImport" title="从 JSON 文件恢复记录">导入</button>
+      </div>
+    </div>
+    <div class="summary">
+      <span>共 <b id="sumTotal">0</b> 条</span>
+      <span>进行中 <b id="sumOpen">0</b></span>
+      <span>已结束 <b id="sumClosed">0</b></span>
+      <span>已发Offer <b id="sumOffer">0</b></span>
+      <span id="sumBackup"></span>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="row">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="搜公司 / 岗位 / 备注（按 / 快速定位）" autocomplete="off">
+      </div>
+      <select class="ctl" id="statusFilter" title="按状态筛选">
+        <option value="all">全部状态</option>
+      </select>
+      <select class="ctl" id="sortBy" title="排序方式">
+        <option value="applied_desc">投递日期 ↓</option>
+        <option value="applied_asc">投递日期 ↑</option>
+        <option value="updated_desc">最近更新 ↓</option>
+        <option value="company_asc">公司名 A→Z</option>
+      </select>
+      <button class="primary-btn" id="btnAdd">＋ 记一条</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<main class="list" id="list"></main>
+
+<div class="tip">
+  数据保存在这台设备的浏览器里（localStorage），换设备或清理缓存前请先「导出备份」。<br>
+  手机和电脑各自独立，用导出 → 导入 在两端之间搬数据。
+</div>
+
+<!-- ===== 新增 / 编辑 ===== -->
+<dialog id="dlgEdit">
+  <div class="dlg-head">
+    <h2 id="dlgTitle">记一条投递</h2>
+    <button class="mini-btn" id="dlgClose">关闭</button>
+  </div>
+  <div class="dlg-body">
+    <div class="grid2">
+      <div class="field">
+        <label>公司名称 <span class="req">*</span></label>
+        <input id="fCompany" placeholder="如：长龙航空" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>岗位名称 <span class="req">*</span></label>
+        <input id="fPosition" placeholder="如：机务维修（2027校招）" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>投递渠道</label>
+        <select id="fChannel"></select>
+      </div>
+      <div class="field">
+        <label>投递日期</label>
+        <input id="fAppliedAt" type="date">
+      </div>
+    </div>
+    <div class="field">
+      <label>当前状态</label>
+      <select id="fStatus"></select>
+      <div class="hint" id="statusHint" style="display:none">
+        状态有变化时，时间线会自动记一条进展。
+        <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+          <span>进展日期</span>
+          <input id="fProgressAt" type="date" class="ctl" style="padding:5px 8px">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>备注</label>
+      <textarea id="fNote" placeholder="投的哪个版本简历、JD 要点、HR 联系方式、薪资范围……"></textarea>
+    </div>
+    <div id="editTimelineWrap" style="display:none">
+      <div class="sec-title">进展时间线</div>
+      <div id="editTimeline" style="font-size:13px;color:#43536b"></div>
+    </div>
+    <div class="err" id="formErr"></div>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn" id="btnCancel">取消</button>
+    <button class="btn primary" id="btnSave">保存</button>
+  </div>
+</dialog>
+
+<!-- ===== 导入方式 ===== -->
+<dialog id="dlgImport">
+  <div class="dlg-head"><h2>导入记录</h2></div>
+  <div class="dlg-body">
+    <p style="margin:0 0 10px;font-size:14px" id="importInfo"></p>
+    <div class="field">
+      <label>导入方式</label>
+      <select id="importMode">
+        <option value="merge">合并（保留现有记录，同一条不重复）</option>
+        <option value="replace">覆盖（清空现有，只用文件里的）</option>
+      </select>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn" id="importCancel">取消</button>
+    <button class="btn primary" id="importOk">导入</button>
+  </div>
+</dialog>
+
+<div id="toast"></div>
+<input type="file" id="fileInput" accept="application/json,.json" style="display:none">
+
+<script>
+(function(){
+"use strict";
+
+/* ============ 常量 ============ */
+var STORE_KEY = 'jobTracker.v1';
+
+var STATUS = [
+  {k:'applied',   label:'已投递',    color:'#0b5fd6', bg:'#e8f0fe'},
+  {k:'screening', label:'筛选中',    color:'#6d28d9', bg:'#f1e9fe'},
+  {k:'test',      label:'笔试/测评', color:'#0e7490', bg:'#e0f5f9'},
+  {k:'interview', label:'面试中',    color:'#b45309', bg:'#fdf1dc'},
+  {k:'medical',   label:'体检/背调', color:'#0f766e', bg:'#e3f6f3'},
+  {k:'offer',     label:'已发Offer', color:'#047857', bg:'#dcfce9'},
+  {k:'hired',     label:'已入职',    color:'#15803d', bg:'#d6f5df'},
+  {k:'rejected',  label:'未通过',    color:'#b91c1c', bg:'#fdeaea'},
+  {k:'withdrawn', label:'已放弃',    color:'#475569', bg:'#eef1f5'}
+];
+var CLOSED = {hired:1, rejected:1, withdrawn:1};
+var STATUS_MAP = {};
+STATUS.forEach(function(s){ STATUS_MAP[s.k] = s; });
+
+var CHANNELS = ['校园招聘会','企业官网','企业公众号','招聘平台(BOSS/智联/前程无忧)','老师/学长推荐','内推','邮箱投递','其他'];
+
+/* ============ 状态 ============ */
+var state = { records: [], lastExportAt: null, prefs: { sort: 'applied_desc' } };
+var ui = { q: '', filter: 'all', expanded: {} };
+var editingId = null;
+var pendingImport = null;
+
+/* ============ 工具 ============ */
+function uid(){
+  return 'j' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function todayStr(){
+  var d = new Date();
+  var m = String(d.getMonth() + 1).padStart(2, '0');
+  var day = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + m + '-' + day;
+}
+function nowISO(){ return new Date().toISOString(); }
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  return String(iso).slice(0, 10);
+}
+function daysBetween(iso){
+  if(!iso) return null;
+  var t = new Date(iso).getTime();
+  if(isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+
+/* ============ 存取 ============ */
+function normalize(r){
+  r = r || {};
+  var rec = {
+    id: r.id || uid(),
+    company: String(r.company || '').trim(),
+    position: String(r.position || '').trim(),
+    channel: r.channel || '其他',
+    appliedAt: r.appliedAt || todayStr(),
+    status: STATUS_MAP[r.status] ? r.status : 'applied',
+    note: String(r.note || ''),
+    timeline: [],
+    createdAt: r.createdAt || nowISO(),
+    updatedAt: r.updatedAt || nowISO()
+  };
+  if(Array.isArray(r.timeline)){
+    rec.timeline = r.timeline.filter(function(t){ return t && STATUS_MAP[t.status]; })
+      .map(function(t){
+        return { status: t.status, at: fmtDate(t.at) || rec.appliedAt, note: String(t.note || '') };
+      });
+  }
+  if(!rec.timeline.length){
+    rec.timeline = [{ status: rec.status, at: rec.appliedAt, note: '' }];
+  }else{
+    var last = rec.timeline[rec.timeline.length - 1];
+    if(last.status !== rec.status){
+      rec.timeline.push({ status: rec.status, at: fmtDate(rec.updatedAt) || rec.appliedAt, note: '' });
+    }
+  }
+  return rec;
+}
+
+function load(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return;
+    var d = JSON.parse(raw);
+    if(d && Array.isArray(d.records)) state.records = d.records.map(normalize);
+    if(d && d.lastExportAt) state.lastExportAt = d.lastExportAt;
+    if(d && d.prefs && d.prefs.sort) state.prefs.sort = d.prefs.sort;
+  }catch(e){
+    console.warn('读取本地记录失败', e);
+  }
+}
+function save(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    return true;
+  }catch(e){
+    toast('保存失败：浏览器存储不可用（隐私模式？）');
+    return false;
+  }
+}
+
+/* ============ 渲染 ============ */
+function counts(){
+  var c = { total: state.records.length, open: 0, closed: 0, offer: 0 };
+  state.records.forEach(function(r){
+    if(CLOSED[r.status]) c.closed++; else c.open++;
+    if(r.status === 'offer' || r.status === 'hired') c.offer++;
+  });
+  return c;
+}
+
+function renderSummary(){
+  var c = counts();
+  document.getElementById('sumTotal').textContent = c.total;
+  document.getElementById('sumOpen').textContent = c.open;
+  document.getElementById('sumClosed').textContent = c.closed;
+  document.getElementById('sumOffer').textContent = c.offer;
+  var el = document.getElementById('sumBackup');
+  if(!c.total){ el.textContent = ''; return; }
+  var d = daysBetween(state.lastExportAt);
+  if(d == null){ el.textContent = '⚠ 还没导出过备份'; el.style.color = '#ffd9a8'; }
+  else if(d >= 7){ el.textContent = '⚠ 上次备份 ' + d + ' 天前'; el.style.color = '#ffd9a8'; }
+  else { el.textContent = '上次备份 ' + (d === 0 ? '今天' : d + ' 天前'); el.style.color = ''; }
+}
+
+function renderChips(){
+  var c = counts();
+  var defs = [
+    {k:'all', label:'全部', n:c.total},
+    {k:'open', label:'进行中', n:c.open},
+    {k:'closed', label:'已结束', n:c.closed}
+  ];
+  var box = document.getElementById('chips');
+  box.innerHTML = defs.map(function(d){
+    return '<button class="chip' + (ui.filter === d.k ? ' on' : '') + '" data-filter="' + d.k + '">' +
+      esc(d.label) + '<span class="n">' + d.n + '</span></button>';
+  }).join('');
+}
+
+function filtered(){
+  var rows = state.records.slice();
+  if(ui.filter === 'open') rows = rows.filter(function(r){ return !CLOSED[r.status]; });
+  else if(ui.filter === 'closed') rows = rows.filter(function(r){ return CLOSED[r.status]; });
+  else if(ui.filter !== 'all') rows = rows.filter(function(r){ return r.status === ui.filter; });
+
+  var q = ui.q.trim().toLowerCase();
+  if(q){
+    rows = rows.filter(function(r){
+      return (r.company + ' ' + r.position + ' ' + r.channel + ' ' + r.note).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  var s = state.prefs.sort;
+  rows.sort(function(a, b){
+    if(s === 'applied_asc') return a.appliedAt < b.appliedAt ? -1 : a.appliedAt > b.appliedAt ? 1 : 0;
+    if(s === 'updated_desc') return a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : 0;
+    if(s === 'company_asc') return a.company.localeCompare(b.company, 'zh-CN');
+    return a.appliedAt > b.appliedAt ? -1 : a.appliedAt < b.appliedAt ? 1 : 0;
+  });
+  return rows;
+}
+
+function statusOptions(selected){
+  return STATUS.map(function(s){
+    return '<option value="' + s.k + '"' + (s.k === selected ? ' selected' : '') + '>' + esc(s.label) + '</option>';
+  }).join('');
+}
+
+function renderList(){
+  var rows = filtered();
+  var box = document.getElementById('list');
+
+  if(!state.records.length){
+    box.innerHTML =
+      '<div class="empty">' +
+        '<h3>还没有记录</h3>' +
+        '<p>点右上角「＋ 记一条」，把今天投的岗位记下来。<br>以后每次投完顺手加一条，就不会忘。</p>' +
+        '<button class="btn primary" id="emptyAdd">＋ 记第一条</button>' +
+      '</div>';
+    var ea = document.getElementById('emptyAdd');
+    if(ea) ea.onclick = function(){ openEdit(null); };
+    return;
+  }
+
+  if(!rows.length){
+    box.innerHTML = '<div class="empty"><h3>没有匹配的记录</h3><p>换个关键词，或把筛选切回「全部」。</p></div>';
+    return;
+  }
+
+  box.innerHTML = rows.map(function(r){
+    var st = STATUS_MAP[r.status] || STATUS_MAP.applied;
+    var open = !!ui.expanded[r.id];
+    var meta = [];
+    meta.push('<span>📮 ' + esc(r.channel) + '</span>');
+    meta.push('<span>📅 投递 ' + esc(r.appliedAt) + '</span>');
+    var since = daysBetween(r.appliedAt);
+    if(since !== null && !CLOSED[r.status] && since >= 0){
+      meta.push('<span>⏳ 已 ' + since + ' 天</span>');
+    }
+    var tl = r.timeline.map(function(t){
+      var ts = STATUS_MAP[t.status] || STATUS_MAP.applied;
+      return '<div class="tl-item">' +
+        '<div class="tl-date">' + esc(t.at) + '</div>' +
+        '<div class="tl-body"><span class="tl-tag" style="color:' + ts.color + '">' + esc(ts.label) + '</span>' +
+        (t.note ? '<div class="tl-note">' + esc(t.note) + '</div>' : '') +
+        '</div></div>';
+    }).join('');
+
+    return '<article class="job-card" data-id="' + esc(r.id) + '">' +
+      '<div class="card-head">' +
+        '<div class="card-title">' +
+          '<div class="company">' + esc(r.company) + '</div>' +
+          '<div class="position">' + esc(r.position) + '</div>' +
+        '</div>' +
+        '<span class="pill" style="color:' + st.color + ';background:' + st.bg + '">' + esc(st.label) + '</span>' +
+      '</div>' +
+      '<div class="meta">' + meta.join('') + '</div>' +
+      (r.note ? '<div class="note-line">' + esc(r.note) + '</div>' : '') +
+      '<div class="card-foot">' +
+        '<select class="status-select" data-act="status" title="快速改状态">' + statusOptions(r.status) + '</select>' +
+        '<button class="mini-btn" data-act="timeline">' + (open ? '收起时间线' : '时间线 (' + r.timeline.length + ')') + '</button>' +
+        '<button class="mini-btn" data-act="edit">编辑</button>' +
+        '<span class="spacer"></span>' +
+        '<button class="mini-btn danger" data-act="del">删除</button>' +
+      '</div>' +
+      '<div class="timeline' + (open ? ' open' : '') + '">' +
+        (tl || '<div class="tl-note">暂无进展</div>') +
+      '</div>' +
+    '</article>';
+  }).join('');
+}
+
+function render(){
+  renderSummary();
+  renderChips();
+  renderList();
+}
+
+/* ============ 增删改 ============ */
+function findRecord(id){
+  for(var i = 0; i < state.records.length; i++){
+    if(state.records[i].id === id) return state.records[i];
+  }
+  return null;
+}
+
+function setStatus(id, next, at){
+  var r = findRecord(id);
+  if(!r || !STATUS_MAP[next] || r.status === next) return;
+  r.status = next;
+  r.timeline.push({ status: next, at: at || todayStr(), note: '' });
+  r.updatedAt = nowISO();
+  save();
+  render();
+  toast('已更新为「' + STATUS_MAP[next].label + '」');
+}
+
+function deleteRecord(id){
+  var r = findRecord(id);
+  if(!r) return;
+  if(!confirm('删除这条记录？\n\n' + r.company + ' · ' + r.position + '\n\n删除后无法恢复（除非之前导出过备份）。')) return;
+  state.records = state.records.filter(function(x){ return x.id !== id; });
+  save();
+  render();
+  toast('已删除');
+}
+
+/* ============ 编辑弹窗 ============ */
+var dlg = document.getElementById('dlgEdit');
+
+function fillSelects(){
+  document.getElementById('fChannel').innerHTML = CHANNELS.map(function(c){
+    return '<option value="' + esc(c) + '">' + esc(c) + '</option>';
+  }).join('');
+  document.getElementById('fStatus').innerHTML = statusOptions('applied');
+  var sf = document.getElementById('statusFilter');
+  sf.innerHTML = '<option value="all">全部状态</option>' +
+    STATUS.map(function(s){ return '<option value="' + s.k + '">' + esc(s.label) + '</option>'; }).join('');
+}
+
+function openEdit(id){
+  editingId = id;
+  var r = id ? findRecord(id) : null;
+  document.getElementById('dlgTitle').textContent = r ? '编辑投递记录' : '记一条投递';
+  document.getElementById('fCompany').value = r ? r.company : '';
+  document.getElementById('fPosition').value = r ? r.position : '';
+  document.getElementById('fChannel').value = r ? r.channel : (CHANNELS[0]);
+  if(r && CHANNELS.indexOf(r.channel) < 0){
+    var opt = document.createElement('option');
+    opt.value = r.channel; opt.textContent = r.channel;
+    document.getElementById('fChannel').appendChild(opt);
+    document.getElementById('fChannel').value = r.channel;
+  }
+  document.getElementById('fAppliedAt').value = r ? r.appliedAt : todayStr();
+  document.getElementById('fStatus').value = r ? r.status : 'applied';
+  document.getElementById('fNote').value = r ? r.note : '';
+  document.getElementById('fProgressAt').value = todayStr();
+  document.getElementById('formErr').classList.remove('show');
+  document.getElementById('statusHint').style.display = 'none';
+
+  var tw = document.getElementById('editTimelineWrap');
+  if(r){
+    tw.style.display = 'block';
+    document.getElementById('editTimeline').innerHTML = r.timeline.map(function(t){
+      var ts = STATUS_MAP[t.status] || STATUS_MAP.applied;
+      return '<div class="tl-item"><div class="tl-date">' + esc(t.at) + '</div>' +
+        '<div class="tl-body"><span class="tl-tag" style="color:' + ts.color + '">' + esc(ts.label) + '</span>' +
+        (t.note ? '<div class="tl-note">' + esc(t.note) + '</div>' : '') + '</div></div>';
+    }).join('');
+  }else{
+    tw.style.display = 'none';
+  }
+  dlg.showModal();
+  setTimeout(function(){ document.getElementById('fCompany').focus(); }, 30);
+}
+
+document.getElementById('fStatus').addEventListener('change', function(){
+  var r = editingId ? findRecord(editingId) : null;
+  var base = r ? r.status : 'applied';
+  document.getElementById('statusHint').style.display = (this.value !== base) ? 'block' : 'none';
+});
+
+function saveEdit(){
+  var company = document.getElementById('fCompany').value.trim();
+  var position = document.getElementById('fPosition').value.trim();
+  var err = document.getElementById('formErr');
+  if(!company || !position){
+    err.textContent = '公司名称和岗位名称都要填。';
+    err.classList.add('show');
+    return;
+  }
+  var status = document.getElementById('fStatus').value;
+  var appliedAt = document.getElementById('fAppliedAt').value || todayStr();
+  var progressAt = document.getElementById('fProgressAt').value || todayStr();
+  var channel = document.getElementById('fChannel').value;
+  var note = document.getElementById('fNote').value;
+
+  if(editingId){
+    var r = findRecord(editingId);
+    if(r){
+      var changed = (r.status !== status);
+      r.company = company; r.position = position;
+      r.channel = channel; r.appliedAt = appliedAt;
+      r.note = note; r.status = status;
+      if(changed) r.timeline.push({ status: status, at: progressAt, note: '' });
+      r.updatedAt = nowISO();
+    }
+  }else{
+    var rec = normalize({
+      company: company, position: position, channel: channel,
+      appliedAt: appliedAt, status: status, note: note
+    });
+    rec.timeline = [{ status: status, at: appliedAt, note: '' }];
+    state.records.push(rec);
+  }
+  save();
+  dlg.close();
+  render();
+  toast(editingId ? '已保存' : '已记一条：' + company);
+  editingId = null;
+}
+
+/* ============ 导出 / 导入 ============ */
+function exportJSON(){
+  if(!state.records.length){ toast('还没有记录，先记一条'); return; }
+  var data = { app: 'job-tracker', version: 1, exportedAt: nowISO(), records: state.records };
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '投递记录-' + todayStr() + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  state.lastExportAt = nowISO();
+  save();
+  renderSummary();
+  toast('已导出 ' + state.records.length + ' 条记录');
+}
+
+function pickFile(){
+  document.getElementById('fileInput').click();
+}
+
+function handleFile(file){
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var data;
+    try{ data = JSON.parse(String(reader.result)); }
+    catch(e){ toast('文件不是合法 JSON'); return; }
+    var arr = Array.isArray(data) ? data : (data && Array.isArray(data.records) ? data.records : null);
+    if(!arr){ toast('文件里没找到记录数组'); return; }
+    var recs = arr.map(normalize).filter(function(r){ return r.company || r.position; });
+    if(!recs.length){ toast('文件里没有有效记录'); return; }
+    pendingImport = recs;
+    document.getElementById('importInfo').textContent =
+      '文件里有 ' + recs.length + ' 条记录，当前本机有 ' + state.records.length + ' 条。';
+    document.getElementById('dlgImport').showModal();
+  };
+  reader.onerror = function(){ toast('文件读取失败'); };
+  reader.readAsText(file, 'utf-8');
+}
+
+function doImport(mode){
+  var recs = pendingImport || [];
+  pendingImport = null;
+  document.getElementById('dlgImport').close();
+  if(!recs.length) return;
+
+  if(mode === 'replace'){
+    state.records = recs.slice();
+    save(); render();
+    toast('已覆盖导入 ' + recs.length + ' 条');
+    return;
+  }
+  // merge：先按 id，再按 公司+岗位+投递日期 去重
+  var byId = {}, byKey = {};
+  state.records.forEach(function(r){
+    byId[r.id] = r;
+    byKey[r.company + '|' + r.position + '|' + r.appliedAt] = r;
+  });
+  var added = 0, updated = 0, skipped = 0;
+  recs.forEach(function(r){
+    var exist = byId[r.id] || byKey[r.company + '|' + r.position + '|' + r.appliedAt];
+    if(exist){
+      if(r.updatedAt > exist.updatedAt){
+        var i = state.records.indexOf(exist);
+        state.records[i] = r;
+        byId[r.id] = r;
+        byKey[r.company + '|' + r.position + '|' + r.appliedAt] = r;
+        updated++;
+      }else{
+        skipped++;
+      }
+    }else{
+      state.records.push(r);
+      byId[r.id] = r;
+      byKey[r.company + '|' + r.position + '|' + r.appliedAt] = r;
+      added++;
+    }
+  });
+  save(); render();
+  toast('合并完成：新增 ' + added + ' 条，更新 ' + updated + ' 条，跳过 ' + skipped + ' 条');
+}
+
+/* ============ 事件绑定 ============ */
+document.getElementById('btnAdd').onclick = function(){ openEdit(null); };
+document.getElementById('btnAddMobile').onclick = function(){ openEdit(null); };
+document.getElementById('emptyAdd') && (document.getElementById('emptyAdd').onclick = function(){ openEdit(null); });
+document.getElementById('btnExport').onclick = exportJSON;
+document.getElementById('btnImport').onclick = pickFile;
+document.getElementById('dlgClose').onclick = function(){ dlg.close(); };
+document.getElementById('btnCancel').onclick = function(){ dlg.close(); };
+document.getElementById('btnSave').onclick = saveEdit;
+
+document.getElementById('importCancel').onclick = function(){
+  pendingImport = null; document.getElementById('dlgImport').close();
+};
+document.getElementById('importOk').onclick = function(){
+  doImport(document.getElementById('importMode').value);
+};
+
+document.getElementById('fileInput').addEventListener('change', function(e){
+  var f = e.target.files && e.target.files[0];
+  handleFile(f);
+  e.target.value = '';
+});
+
+document.getElementById('q').addEventListener('input', function(){
+  ui.q = this.value;
+  renderList();
+});
+
+document.getElementById('statusFilter').addEventListener('change', function(){
+  ui.filter = this.value;
+  renderChips();
+  renderList();
+});
+
+document.getElementById('sortBy').addEventListener('change', function(){
+  state.prefs.sort = this.value;
+  save();
+  renderList();
+});
+
+document.getElementById('chips').addEventListener('click', function(e){
+  var b = e.target.closest('.chip');
+  if(!b) return;
+  ui.filter = b.getAttribute('data-filter');
+  document.getElementById('statusFilter').value = 'all';
+  renderChips();
+  renderList();
+});
+
+document.getElementById('list').addEventListener('click', function(e){
+  var card = e.target.closest('.job-card');
+  if(!card) return;
+  var id = card.getAttribute('data-id');
+  var btn = e.target.closest('[data-act]');
+  if(!btn) return;
+  var act = btn.getAttribute('data-act');
+  if(act === 'edit') openEdit(id);
+  else if(act === 'del') deleteRecord(id);
+  else if(act === 'timeline'){
+    ui.expanded[id] = !ui.expanded[id];
+    renderList();
+  }
+});
+
+document.getElementById('list').addEventListener('change', function(e){
+  var sel = e.target.closest('[data-act="status"]');
+  if(!sel) return;
+  var card = sel.closest('.job-card');
+  var id = card.getAttribute('data-id');
+  setStatus(id, sel.value);
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === '/' && document.activeElement.tagName !== 'INPUT' &&
+     document.activeElement.tagName !== 'TEXTAREA' &&
+     document.activeElement.tagName !== 'SELECT'){
+    e.preventDefault();
+    document.getElementById('q').focus();
+  }
+});
+
+/* ============ 启动 ============ */
+fillSelects();
+load();
+document.getElementById('sortBy').value = state.prefs.sort;
+render();
+
+})();
+</script>
+</body>
+</html>
